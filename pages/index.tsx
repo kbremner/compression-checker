@@ -17,6 +17,18 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Compression checker</title>
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <meta
           name="description"
           content="Check how much a file could be compressed using brotli, gzip or deflate"
@@ -25,6 +37,13 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>How much could you save by using compression?</h1>
+        <div style={{ fontSize: "6rem" }}>📦</div>
+        <p>
+          <em>
+            (and why you should care -{" "}
+            <a href="https://bit.ly/3g4sE1f">https://bit.ly/3g4sE1f</a>)
+          </em>
+        </p>
         <form className={styles.form} onSubmit={onSubmit}>
           <input
             value={url}
