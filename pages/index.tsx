@@ -1,16 +1,31 @@
 import Head from "next/head";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
   const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+  const workerRef = useRef<Worker>();
+  useEffect(() => {
+    workerRef.current = new Worker(new URL("../worker.js", import.meta.url));
+    workerRef.current.onmessage = (evt) => {
+      setLoading(false);
+      console.log("WebWorker Response =>", evt);
+    };
+    return () => {
+      workerRef.current.terminate();
+    };
+  }, []);
+
+  const calcResults = useCallback(async (url) => {
+    setLoading(true);
+    workerRef.current.postMessage(url);
+  }, []);
+
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    fetch(`/api/measure?url=${encodeURIComponent(url)}`)
-      .then((result) => result.json())
-      .then((result) => console.log(url, result))
-      .catch((e) => console.error("oops...", e));
+    calcResults(url);
   };
 
   return (
@@ -51,7 +66,7 @@ export default function Home() {
             className={styles.input}
             placeholder="Enter the URL of an asset to check..."
           ></input>
-          <button className={styles.submitBtn} type="submit">
+          <button disabled={loading} className={styles.submitBtn} type="submit">
             Crunch the numbers!
           </button>
         </form>
